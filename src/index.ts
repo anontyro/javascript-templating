@@ -8,20 +8,22 @@ const REGEX_SELECTORS = {
 };
 
 const testHTML = `
-  h1 class[standard my-main-header]: This is the header
+  h1 class[standard my-main-header]: This is the new header 
   h2: Smaller header
   p: This is a paragraph : with some stuff
   h3: Smallerer header
 `;
 
-const addClasses = (selectedComponent, initComponentString) => {
+const addClasses = (selectedComponent: any, initComponentString: any) => {
   const classList = initComponentString.match(REGEX_SELECTORS.CLASS_SELECTOR);
   if (!classList || classList.length < 2) {
     return selectedComponent;
   }
   const classesArr = classList[1].split(' ');
   let finalClassString = `class=' `;
-  classesArr.forEach(cls => (finalClassString = `${finalClassString} ${cls} `));
+  classesArr.forEach(
+    (cls: any) => (finalClassString = `${finalClassString} ${cls} `)
+  );
   finalClassString = finalClassString + `'`;
   const selectedComponentStart = selectedComponent.substring(
     0,
@@ -34,18 +36,24 @@ const addClasses = (selectedComponent, initComponentString) => {
   return `${selectedComponentStart} ${finalClassString} ${selectedComponentEnd}`;
 };
 
-const getTags = (htmlString = testHTML, components = COMPONENT_MAP) => {
+const getTags = (htmlString = testHTML, components: any = COMPONENT_MAP) => {
   const componentTypeMatcher = new RegExp(/^(.*?):/gm);
   const componentMatcher = new RegExp(/.*:.*/gm);
-  const componentList = htmlString.match(componentMatcher);
+  const componentList = htmlString.match(componentMatcher) || [];
   const componentListTypes = htmlString.match(componentTypeMatcher);
   let output = '';
   componentList.forEach(tag => {
     const splitByTag = new RegExp(/^(.*?):/);
     const onlyTag = new RegExp(/([A-Za-z0-9]){1,}/);
     const componentSplit = tag.trim().split(splitByTag);
-    const foundTag = componentSplit[1].match(onlyTag)[0];
-    let selectedComponent = components[foundTag];
+    if (!componentSplit || componentSplit.length < 2) {
+      return;
+    }
+    const foundTag = (componentSplit[1] || '').match(onlyTag);
+    if (!foundTag) {
+      return;
+    }
+    let selectedComponent = components[foundTag[0]];
     if (!selectedComponent) {
       return;
     }
@@ -64,6 +72,10 @@ const getTags = (htmlString = testHTML, components = COMPONENT_MAP) => {
 
 const buildNoAppError = () => {
   const domBody = document.querySelector('body');
+  if (!domBody) {
+    console.error('nothing in the dom :( :(');
+    return;
+  }
   domBody.innerHTML = `<h1>No App tag found in dom</h1>`;
 };
 
