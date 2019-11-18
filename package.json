@@ -2,13 +2,20 @@
   "name": "templating-eng",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "index.js",
   "scripts": {
+    "dev:build": "rm -rf dist && npx webpack --config webpack.config.js && cp index.html dist/index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "alexwilkinson@gmail.com",
   "license": "MIT",
   "devDependencies": {
-    "nodemon": "^1.19.4"
+    "ava": "^2.4.0",
+    "css-loader": "^3.2.0",
+    "file-loader": "^4.2.0",
+    "nodemon": "^1.19.4",
+    "style-loader": "^1.0.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
   }
 }

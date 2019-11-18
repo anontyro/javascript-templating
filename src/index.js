@@ -1,3 +1,6 @@
+import {COMPONENT_MAP} from './data/componentData';
+import './styles/base.css';
+
 const REGEX_SELECTORS = {
   COMPLETE_COMPONENT_SELECTOR: new RegExp(/.*:.*/gm),
   CLASS_SELECTOR: new RegExp(/.*\sclass\[(.*)]:/),
@@ -10,12 +13,6 @@ const testHTML = `
   p: This is a paragraph : with some stuff
   h3: Smallerer header
 `;
-
-const componentMap = {
-  h1: '<h1>{{value}}</h1>',
-  h2: '<h2>{{value}}</h2>',
-  h3: '<h3>{{value}}</h3>',
-};
 
 const addClasses = (selectedComponent, initComponentString) => {
   const classList = initComponentString.match(REGEX_SELECTORS.CLASS_SELECTOR);
@@ -37,7 +34,7 @@ const addClasses = (selectedComponent, initComponentString) => {
   return `${selectedComponentStart} ${finalClassString} ${selectedComponentEnd}`;
 };
 
-const getTags = (htmlString = testHTML, components = componentMap) => {
+const getTags = (htmlString = testHTML, components = COMPONENT_MAP) => {
   const componentTypeMatcher = new RegExp(/^(.*?):/gm);
   const componentMatcher = new RegExp(/.*:.*/gm);
   const componentList = htmlString.match(componentMatcher);
@@ -48,7 +45,7 @@ const getTags = (htmlString = testHTML, components = componentMap) => {
     const onlyTag = new RegExp(/([A-Za-z0-9]){1,}/);
     const componentSplit = tag.trim().split(splitByTag);
     const foundTag = componentSplit[1].match(onlyTag)[0];
-    let selectedComponent = componentMap[foundTag];
+    let selectedComponent = components[foundTag];
     if (!selectedComponent) {
       return;
     }
@@ -70,7 +67,7 @@ const buildNoAppError = () => {
   domBody.innerHTML = `<h1>No App tag found in dom</h1>`;
 };
 
-const buildApp = (htmlString = testHTML, components = componentMap) => {
+const buildApp = (htmlString = testHTML, components = COMPONENT_MAP) => {
   const app = document.querySelector('.app');
 
   if (!app) {
