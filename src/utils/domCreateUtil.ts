@@ -9,11 +9,11 @@ export const addClasses = (
     return selectedComponent;
   }
   const classesArr = classList[1].split(' ');
-  let finalClassString = `class=' `;
+  let finalClassString = `class='`;
   classesArr.forEach(
-    (cls: any) => (finalClassString = `${finalClassString} ${cls} `)
+    (cls: any) => (finalClassString = `${finalClassString}${cls} `)
   );
-  finalClassString = finalClassString + `'`;
+  finalClassString = finalClassString.trim() + `'`;
   const selectedComponentStart = selectedComponent.substring(
     0,
     selectedComponent.indexOf('>')
