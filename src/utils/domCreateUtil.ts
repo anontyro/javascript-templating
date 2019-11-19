@@ -25,36 +25,60 @@ export const addClasses = (
   return `${selectedComponentStart} ${finalClassString} ${selectedComponentEnd}`;
 };
 
-export const getTags = (htmlString: string, components: any): string => {
-  const componentTypeMatcher = new RegExp(/^(.*?):/gm);
-  const componentMatcher = new RegExp(/.*:.*/gm);
-  const componentList = htmlString.match(componentMatcher) || [];
-  const componentListTypes = htmlString.match(componentTypeMatcher);
+const replacePlaceholderValue = (
+  userComponent: string,
+  replaceValue: string,
+  placeholder: string = '{{value}}'
+): string => userComponent.replace(placeholder, replaceValue);
+
+const matchAvaliableComponents = (
+  htmlString: string,
+  componentMatcher = REGEX_SELECTORS.COMPLETE_COMPONENT_SELECTOR
+): string[] => htmlString.match(componentMatcher) || [];
+
+const splitTagIntoSections = (
+  tag: string,
+  splitByTag = REGEX_SELECTORS.TAG_SELECTOR
+): {htmlTag: string; value: string} => {
+  const componentSplit = tag.trim().split(splitByTag);
+  if (!componentSplit || componentSplit.length < 2) {
+    return {
+      htmlTag: '',
+      value: '',
+    };
+  }
+  return {
+    htmlTag: componentSplit[1],
+    value: componentSplit[2],
+  };
+};
+
+const mapComponentsToTags = (
+  componentList: string[],
+  components: any
+): string => {
   let output = '';
   componentList.forEach(tag => {
-    const splitByTag = new RegExp(/^(.*?):/);
-    const onlyTag = new RegExp(/([A-Za-z0-9]){1,}/);
-    const componentSplit = tag.trim().split(splitByTag);
-    if (!componentSplit || componentSplit.length < 2) {
-      return;
-    }
-    const foundTag = (componentSplit[1] || '').match(onlyTag);
-    if (!foundTag) {
-      return;
-    }
-    let selectedComponent = components[foundTag[0]];
+    const onlyTag = REGEX_SELECTORS.TAG_SECTION_SELECTOR;
+
+    const {htmlTag, value} = splitTagIntoSections(tag);
+    const foundTag = htmlTag.match(onlyTag) || [];
+
+    let selectedComponent: string = components[foundTag[0]];
     if (!selectedComponent) {
       return;
     }
     selectedComponent = addClasses(selectedComponent, tag);
-    const finalComponent = selectedComponent.replace(
-      '{{value}}',
-      componentSplit[2]
-    );
+    const finalComponent = replacePlaceholderValue(selectedComponent, value);
 
     output = output + '\n' + finalComponent;
     return;
   });
-
   return output;
+};
+
+export const getTags = (htmlString: string, components: any): string => {
+  const componentList = matchAvaliableComponents(htmlString);
+
+  return mapComponentsToTags(componentList, components);
 };
